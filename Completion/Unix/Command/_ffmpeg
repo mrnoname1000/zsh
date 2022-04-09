@@ -110,19 +110,19 @@ local -a _ffmpeg_argspecs
     _call_program options $words[1] -h 2>/dev/null | while IFS=$'\n' read -r; do
         if [[ $REPLY == -* ]]; then
             [[ -n $lastopt ]] && _ffmpeg_register_lastopt_values
-            lastopt=${REPLY%%[[:space:]]*}
-            lastopt_description=${REPLY##-[^[:space:]]##[[:space:]]##}
-            if [[ $lastopt_description == (#b)'<'(?##)'>'* ]]; then
+            lastopt=${REPLY%%[[:space:]][[:space:]]*}
+            lastopt_description=${REPLY##*[[:space:]][[:space:]]}
+            if [[ $lastopt == (#b)*'<'(?##)'>' ]]; then
                 lastopt_type=$match[1]
-                lastopt_description=${lastopt_description##<[^[:space:]]##>[[:space:]]##[^[:space:]]##[[:space:]]#}
+                lastopt=${lastopt%%[[:space:]]##<[^[:space:]]##>}
                 if [[ -z $lastopt_description ]]; then
                     lastopt_description=$lastopt
                 fi
                 lastopt_description=${lastopt_description//:/\\:}
-            elif [[ $lastopt_description == [^[:space:]]##[[:space:]][[:space:]]* ]]; then
-                local example=${lastopt_description%%[[:space:]]*}
+            elif [[ $lastopt == *[[:space:]]* ]]; then
+                local example=${lastopt##-[^[:space:]]##[[:space:]]##}
                 example=${example//:/\\:}
-                lastopt_description=${lastopt_description##[^[:space:]]##[[:space:]]##}
+                lastopt=${lastopt%%[[:space:]]*}
                 lastopt_description=${lastopt_description//:/\\:}
                 if [[ $example == filename ]]; then
                     lastopt_takesargs=0
