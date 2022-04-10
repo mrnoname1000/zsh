@@ -121,7 +121,7 @@ local -a _ffmpeg_argspecs
     local lastopt_action
     local -a lastopt_values
 
-    _call_program options $words[1] -h 2>/dev/null | while IFS=$'\n' read -r; do
+    _call_program options $words[1] -h long 2>/dev/null | while IFS=$'\n' read -r; do
         if [[ $REPLY == -* ]]; then
             [[ -n $lastopt ]] && _ffmpeg_register_lastopt_values
             REPLY=${REPLY//:/\\:}
