@@ -50,10 +50,28 @@ setopt rcquotes
     _wanted ffmpeg-pix-fmts expl 'pixel format' compadd -a pix_fmts
 }
 
+(( $+functions[_ffmpeg_hwaccels] )) || _ffmpeg_hwaccels() {
+    local hwaccels
+    hwaccels=(${${(f)"$(_call_program hwaccels $words[1] -hwaccels 2>/dev/null)"}[2,-1]})
+    _wanted ffmpeg-hwaccels expl 'hwaccel name' compadd -a hwaccels
+}
+
 (( $+functions[_ffmpeg_bsfs] )) || _ffmpeg_bsfs() {
     local bsfs
     bsfs=(${${(f)"$(_call_program bsfs $words[1] -bsfs 2>/dev/null)"}:#*:})
     _wanted ffmpeg-bsfs expl 'set bitstream filter' compadd -a bsfs
+}
+
+(( $+functions[_ffmpeg_devices] )) || _ffmpeg_devices() {
+    local devices
+    devices=(${(@s.,.)${${(M)${(f)"$(_call_program devices $words[1] -devices 2>/dev/null)"}:#[[:space:]][D[:space:]][E[:space:]][[:space:]][^[:space:]][^[:space:]]##*}//(#b)????([^[:space:]]##)*/$match[1]}})
+    _wanted ffmpeg-devices expl 'device' compadd -a devices
+}
+
+(( $+functions[_ffmpeg_sample_fmts] )) || _ffmpeg_sample_fmts() {
+    local sample_fmts
+    sample_fmts=(${${(f)"$(_call_program sample-formats $words[1] -sample_fmts 2>/dev/null)"}[2,-1]//(#b)([^[:space:]]##)[[:space:]]##([^[:space:]]##)/$match[1]:$match[2] bit})
+    _describe -O -t ffmpeg-sample-formats 'set sample format' sample_fmts
 }
 
 typeset -A _ffmpeg_flags
@@ -148,6 +166,17 @@ local -a _ffmpeg_argspecs
                 lastopt_takesargs=1
                 if [[ $example == filename ]]; then
                     lastopt_action=_files
+                elif [[ $example == device ]]; then
+                    lastopt_action=_ffmpeg_devices
+                elif [[ $example == bitstream_filters ]]; then
+                    lastopt_action=_ffmpeg_bsfs
+                elif [[ $example == "hwaccel name" ]]; then
+                    lastopt_action=_ffmpeg_hwaccels
+                elif [[ $example == loglevel ]]; then
+                    lastopt_values=(quiet panic fatal error warning info verbose debug trace)
+                elif [[ $example == url ]]; then
+                    lastopt_action=_urls
+
                 elif [[ $lastopt == -[asv]pre ]]; then
                     lastopt_prefix="*"
                     lastopt_action=_ffmpeg_presets
@@ -166,8 +195,15 @@ local -a _ffmpeg_argspecs
                 elif [[ $lastopt == -pix_fmt ]]; then
                     lastopt_prefix="*"
                     lastopt_action=_ffmpeg_pix_fmts
-                elif [[ $example == bitstream_filters ]]; then
-                    lastopt_action=_ffmpeg_bsfs
+                elif [[ $lastopt == -sample_fmt ]]; then
+                    example=""
+                    lastopt_action=_ffmpeg_sample_fmts
+                elif [[ $lastopt == -target ]]; then
+                    lastopt_values=(vcd svcd dvd dv dv50)
+                    lastopt_values+=({pal,ntsc,film}-$^lastopt_values)
+                    lastopt_description=${lastopt_description%% \([^)]##\)}
+                elif [[ $lastopt == -abort_on ]]; then
+                    lastopt_values=(empty_output{,_stream})
                 elif [[ $lastopt == -vf ]]; then
                     lastopt_action="->vfilters"
                 fi
