@@ -152,6 +152,7 @@ local -a _ffmpeg_argspecs
                     lastopt_prefix="*"
                     lastopt_action=_ffmpeg_presets
                 elif [[ $lastopt == (-[vas]codec|-codec|-c) ]]; then
+                    example=""
                     lastopt_prefix="*"
                     case $lastopt[2] in
                         (v) lastopt_action=_ffmpeg_vcodecs ;;
