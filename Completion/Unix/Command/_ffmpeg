@@ -175,6 +175,8 @@ local -a _ffmpeg_argspecs
                 if [[ -n $example ]]; then
                     lastopt_description+=" ($example)"
                 fi
+            elif [[ $lastopt == -stdin ]]; then
+                lastopt_description="enable interaction on standard input"
             else
                 lastopt_takesargs=0
             fi
@@ -186,6 +188,15 @@ local -a _ffmpeg_argspecs
         fi
     done
     [[ -n $lastopt ]] && _ffmpeg_register_lastopt_values
+
+
+    # options that aren't in ffmpeg's help output
+    _ffmpeg_argspecs+=(
+        '*-c\:v:force video codec (''copy'' to copy stream):_ffmpeg_vcodecs'
+        '*-c\:a:force audio codec (''copy'' to copy stream):_ffmpeg_acodecs'
+        '*-c\:s:force subtitle codec (''copy'' to copy stream):_ffmpeg_scodecs'
+        '-nostdin:disable interaction on standard input:'
+    )
 }
 
 _arguments -C -S \
