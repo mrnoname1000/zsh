@@ -129,7 +129,12 @@ local -a _ffmpeg_argspecs
             lastopt_description=${REPLY##*[[:space:]][[:space:]]}
             lastopt_type="" lastopt_prefix="" lastopt_action=""
             lastopt_values=()
-            if [[ $lastopt == (#b)*'<'(?##)'>' ]]; then
+            if [[ $lastopt == -hide_banner* ]]; then
+                lastopt_takesargs=0
+                lastopt=${lastopt%%[[:space:]]*}
+                # I don't know why, but _argument fails unless this underscore is escaped
+                lastopt=${lastopt/_/\\_}
+            elif [[ $lastopt == (#b)*'<'(?##)'>' ]]; then
                 lastopt_type=$match[1]
                 lastopt=${lastopt%%[[:space:]]##<[^[:space:]]##>}
                 if [[ -z $lastopt_description ]]; then
