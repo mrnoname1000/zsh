@@ -123,6 +123,7 @@ local -a _ffmpeg_argspecs
             REPLY=${REPLY//:/\\:}
             lastopt=${REPLY%%[[:space:]][[:space:]]*}
             lastopt_description=${REPLY##*[[:space:]][[:space:]]}
+            lastopt_values=()
             if [[ $lastopt == (#b)*'<'(?##)'>' ]]; then
                 lastopt_type=$match[1]
                 lastopt=${lastopt%%[[:space:]]##<[^[:space:]]##>}
@@ -133,6 +134,7 @@ local -a _ffmpeg_argspecs
                 local example=${lastopt##-[^[:space:]]##[[:space:]]##}
                 lastopt=${lastopt%%[[:space:]]*}
                 lastopt_description+=" ($example)"
+                lastopt_takesargs=1
                 if [[ $example == filename ]]; then
                     lastopt_takesargs=0
                     lastopt+=":$lastopt_description:_files"
@@ -162,13 +164,10 @@ local -a _ffmpeg_argspecs
                     lastopt+=": :_ffmpeg_bsfs"
                 elif [[ $lastopt == -vf ]]; then
                     lastopt+=": :->vfilters"
-                else
-                    lastopt_takesargs=1
                 fi
             else
                 lastopt_takesargs=0
             fi
-            lastopt_values=()
         elif [[ $REPLY == ' '* ]]; then
             REPLY=${REPLY##[[:space:]]##}
             REPLY=${REPLY%%[[:space:]]##*}
