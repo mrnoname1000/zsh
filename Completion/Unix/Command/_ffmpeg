@@ -11,31 +11,31 @@ setopt rcquotes
 }
 
 (( $+functions[_ffmpeg_get_codecs] )) || _ffmpeg_get_codecs() {
-    codecs=(copy ${${(M)${(f)"$(_call_program codecs $words[1] -codecs 2>/dev/null)"}:#[[:space:]][D.][E.]["${(U)1[1]-VAS}"][I.][L.][S.][[:space:]][^[:space:]][^[:space:]]##*}//(#b)????????([^[:space:]]##)*/$match[1]})
+    codecs=(copy ${${${(M)${(f)"$(ffmpeg -codecs 2>/dev/null)"}:#[[:space:]][D.][E.]["${(U)1[1]-VAS}"][I.][L.][S.][[:space:]][^[:space:]][^[:space:]]##*}//:/\\:}//(#b)????????([^[:space:]]##)[[:space:]][[:space:]]##(*)/$match[1]:$match[2]})
 }
 
 (( $+functions[_ffmpeg_codecs] )) || _ffmpeg_codecs() {
     local codecs
     _ffmpeg_get_codecs
-    _wanted ffmpeg-codecs expl 'force codec (''copy'' to copy stream)' compadd -a codecs
+    _describe -O -t ffmpeg-codecs 'force codec (''copy'' to copy stream)' codecs
 }
 
 (( $+functions[_ffmpeg_acodecs] )) || _ffmpeg_acodecs() {
     local codecs
     _ffmpeg_get_codecs audio
-    _wanted ffmpeg-audio-codecs expl 'force audio codec (''copy'' to copy stream)' compadd -a codecs
+    _describe -O -t ffmpeg-acodecs 'force audio codec (''copy'' to copy stream)' codecs
 }
 
 (( $+functions[_ffmpeg_vcodecs] )) || _ffmpeg_vcodecs() {
     local codecs
     _ffmpeg_get_codecs video
-    _wanted ffmpeg-video-codecs expl 'force video codec (''copy'' to copy stream)' compadd -a codecs
+    _describe -O -t ffmpeg-vcodecs 'force video codec (''copy'' to copy stream)' codecs
 }
 
 (( $+functions[_ffmpeg_scodecs] )) || _ffmpeg_scodecs() {
     local codecs
     _ffmpeg_get_codecs subtitle
-    _wanted ffmpeg-subtitle-codecs expl 'force subtitle codec (''copy'' to copy stream)' compadd -a codecs
+    _describe -O -t ffmpeg-scodecs 'force subtitle codec (''copy'' to copy stream)' codecs
 }
 
 (( $+functions[_ffmpeg_formats] )) || _ffmpeg_formats() {
