@@ -145,6 +145,7 @@ local -a _ffmpeg_argspecs
             REPLY=${REPLY//:/\\:}
             lastopt=${REPLY%%[[:space:]][[:space:]]*}
             lastopt_description=${REPLY##*[[:space:]][[:space:]]}
+            lastopt_description=${lastopt_description[1]:l}${lastopt_description:1}
             lastopt_type="" lastopt_prefix="" lastopt_action=""
             lastopt_values=()
             if [[ $lastopt_description == (#i)*(deprecated|removed)* ]]; then
